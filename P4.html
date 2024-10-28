@@ -55,9 +55,10 @@
         }
 
         function getCardValue(card) {
-            if (card.value === 'j' || card.value === 'q' || card.value === 'k') return 10;
-            if (card.value === 'a') return 11;
-            return parseInt(card.value);
+            const cardValue = card.value.toUpperCase(); // Ensure case consistency
+            if (cardValue === 'J' || cardValue === 'Q' || cardValue === 'K') return 10;
+            if (cardValue === 'A') return 11;
+            return parseInt(cardValue);
         }
 
         function deal() {
@@ -97,7 +98,7 @@
             let aces = 0;
             for (let card of cards) {
                 let cardValue = getCardValue(card);
-                if (card.value === 'a') aces += 1;
+                if (card.value.toUpperCase() === 'A') aces += 1;
                 total += cardValue;
             }
             while (total > 21 && aces) {
