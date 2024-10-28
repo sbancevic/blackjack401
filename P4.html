@@ -44,7 +44,7 @@
 
         function createDeck() {
             const suits = ['c', 'd', 'h', 's'];
-            const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+            const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k', 'a']; // Note: All values are lowercase
             deck = [];
             for (let suit of suits) {
                 for (let value of values) {
@@ -55,10 +55,14 @@
         }
 
         function getCardValue(card) {
-            const cardValue = card.value.toUpperCase(); // Ensure case consistency
-            if (cardValue === 'J' || cardValue === 'Q' || cardValue === 'K') return 10;
-            if (cardValue === 'A') return 11;
-            return parseInt(cardValue);
+            let value = card.value.toLowerCase(); // Ensure it is lowercase to match 'j', 'q', 'k', 'a'
+            if (value === 'j' || value === 'q' || value === 'k') {
+                return 10;
+            }
+            if (value === 'a') {
+                return 11; // Initially assign Ace a value of 11
+            }
+            return parseInt(value);
         }
 
         function deal() {
@@ -89,22 +93,29 @@
 
         function updateTotals() {
             playerTotal = calculateTotal(playerCards);
-            dealerTotal = calculateTotal(dealerCards, true);
+            dealerTotal = calculateTotal(dealerCards);
             displayCards();
         }
 
-        function calculateTotal(cards, dealer = false) {
+        function calculateTotal(cards) {
             let total = 0;
             let aces = 0;
             for (let card of cards) {
                 let cardValue = getCardValue(card);
-                if (card.value.toUpperCase() === 'A') aces += 1;
                 total += cardValue;
+
+                // Count the number of Aces
+                if (card.value.toLowerCase() === 'a') {
+                    aces += 1;
+                }
             }
-            while (total > 21 && aces) {
+
+            // Adjust Aces if total exceeds 21
+            while (total > 21 && aces > 0) {
                 total -= 10;
                 aces -= 1;
             }
+
             return total;
         }
 
