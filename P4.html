@@ -93,22 +93,27 @@
 
         function updateTotals(showDealerTotal) {
             playerTotal = calculateTotal(playerCards);
-            dealerTotal = calculateTotal(dealerCards);
+            dealerTotal = calculateTotal(dealerCards, showDealerTotal);
             displayCards(showDealerTotal);
         }
 
-        function calculateTotal(cards) {
+        function calculateTotal(cards, showAllCards = true) {
             let total = 0;
             let aces = 0;
-            for (let card of cards) {
-                let cardValue = getCardValue(card);
+
+            for (let i = 0; i < cards.length; i++) {
+                if (!showAllCards && i > 0) {
+                    continue; // Skip hidden cards if we're not supposed to show them
+                }
+                let cardValue = getCardValue(cards[i]);
                 total += cardValue;
 
-                if (card.value.toLowerCase() === 'a') {
+                if (cards[i].value.toLowerCase() === 'a') {
                     aces += 1;
                 }
             }
 
+            // Adjust Aces if total exceeds 21
             while (total > 21 && aces > 0) {
                 total -= 10;
                 aces -= 1;
@@ -121,7 +126,7 @@
             const cardPath = './cards/';
             // Display player's cards
             document.getElementById("playerCards").innerHTML = playerCards.map(card => `<img class="card" src="${cardPath + card.value + card.suit}.png" alt="${card.value}${card.suit}">`).join('');
-            
+
             // Display dealer's cards (show only the first card if not standing)
             document.getElementById("dealerCards").innerHTML = dealerCards.map((card, index) => {
                 if (!showDealerTotal && index > 0) {
