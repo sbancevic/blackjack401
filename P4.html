@@ -44,7 +44,7 @@
 
         function createDeck() {
             const suits = ['c', 'd', 'h', 's'];
-            const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k', 'a']; // Note: All values are lowercase
+            const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k', 'a'];
             deck = [];
             for (let suit of suits) {
                 for (let value of values) {
@@ -55,7 +55,7 @@
         }
 
         function getCardValue(card) {
-            let value = card.value.toLowerCase(); // Ensure it is lowercase to match 'j', 'q', 'k', 'a'
+            let value = card.value.toLowerCase();
             if (value === 'j' || value === 'q' || value === 'k') {
                 return 10;
             }
@@ -69,21 +69,21 @@
             createDeck();
             playerCards = [deck.pop(), deck.pop()];
             dealerCards = [deck.pop(), deck.pop()];
-            updateTotals();
+            updateTotals(false);
             document.querySelector("button[onclick='hit()']").disabled = false;
             document.querySelector("button[onclick='stand()']").disabled = false;
         }
 
         function hit() {
             playerCards.push(deck.pop());
-            updateTotals();
+            updateTotals(false);
             if (playerTotal > 21) endGame("Player busts! Dealer wins.");
         }
 
         function stand() {
             while (dealerTotal < 17) {
                 dealerCards.push(deck.pop());
-                updateTotals();
+                updateTotals(true);
             }
             if (dealerTotal > 21) endGame("Dealer busts! Player wins.");
             else if (playerTotal > dealerTotal) endGame("Player wins!");
@@ -91,10 +91,10 @@
             else endGame("It's a tie!");
         }
 
-        function updateTotals() {
+        function updateTotals(showDealerTotal) {
             playerTotal = calculateTotal(playerCards);
             dealerTotal = calculateTotal(dealerCards);
-            displayCards();
+            displayCards(showDealerTotal);
         }
 
         function calculateTotal(cards) {
@@ -104,13 +104,11 @@
                 let cardValue = getCardValue(card);
                 total += cardValue;
 
-                // Count the number of Aces
                 if (card.value.toLowerCase() === 'a') {
                     aces += 1;
                 }
             }
 
-            // Adjust Aces if total exceeds 21
             while (total > 21 && aces > 0) {
                 total -= 10;
                 aces -= 1;
@@ -119,12 +117,22 @@
             return total;
         }
 
-        function displayCards() {
+        function displayCards(showDealerTotal) {
             const cardPath = './cards/';
+            // Display player's cards
             document.getElementById("playerCards").innerHTML = playerCards.map(card => `<img class="card" src="${cardPath + card.value + card.suit}.png" alt="${card.value}${card.suit}">`).join('');
-            document.getElementById("dealerCards").innerHTML = dealerCards.map((card, index) => index === 0 ? `<img class="card" src="${cardPath + card.value + card.suit}.png" alt="${card.value}${card.suit}">` : `<img class="card" src="${cardPath}back.png" alt="back">`).join('');
+            
+            // Display dealer's cards (show only the first card if not standing)
+            document.getElementById("dealerCards").innerHTML = dealerCards.map((card, index) => {
+                if (!showDealerTotal && index > 0) {
+                    return `<img class="card" src="${cardPath}back.png" alt="back">`;
+                }
+                return `<img class="card" src="${cardPath + card.value + card.suit}.png" alt="${card.value}${card.suit}">`;
+            }).join('');
+
+            // Display totals
             document.getElementById("playerTotal").innerText = playerTotal;
-            document.getElementById("dealerTotal").innerText = dealerCards.length > 1 ? dealerTotal : getCardValue(dealerCards[0]);
+            document.getElementById("dealerTotal").innerText = showDealerTotal ? dealerTotal : getCardValue(dealerCards[0]);
         }
 
         function endGame(message) {
