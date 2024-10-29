@@ -77,7 +77,7 @@
         function hit() {
             playerCards.push(deck.pop());
             updateTotals(false);
-            if (playerTotal > 21) endGame("Player busts! Dealer wins.");
+            if (playerTotal > 21) delayedEndGame("Player busts! Dealer wins.");
         }
 
         function stand() {
@@ -85,10 +85,10 @@
                 dealerCards.push(deck.pop());
                 updateTotals(true);
             }
-            if (dealerTotal > 21) endGame("Dealer busts! Player wins.");
-            else if (playerTotal > dealerTotal) endGame("Player wins!");
-            else if (playerTotal < dealerTotal) endGame("Dealer wins!");
-            else endGame("It's a tie!");
+            if (dealerTotal > 21) delayedEndGame("Dealer busts! Player wins.");
+            else if (playerTotal > dealerTotal) delayedEndGame("Player wins!");
+            else if (playerTotal < dealerTotal) delayedEndGame("Dealer wins!");
+            else delayedEndGame("It's a tie!");
         }
 
         function updateTotals(showDealerTotal) {
@@ -138,6 +138,11 @@
             // Display totals
             document.getElementById("playerTotal").innerText = playerTotal;
             document.getElementById("dealerTotal").innerText = showDealerTotal ? dealerTotal : getCardValue(dealerCards[0]);
+        }
+
+        function delayedEndGame(message) {
+            // Wait 500 milliseconds to allow the display to update first
+            setTimeout(() => endGame(message), 500);
         }
 
         function endGame(message) {
